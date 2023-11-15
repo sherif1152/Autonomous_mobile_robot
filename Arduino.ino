@@ -1,6 +1,4 @@
 
-#include <Adafruit_MotorShield.h>
-#include <Wire.h>
 #include <PID_v1.h>
 #include <ros.h>
 #include <std_msgs/String.h>
@@ -21,9 +19,18 @@ const int PIN_ENCOD_B_MOTOR_LEFT = 4;               //B channel for encoder of l
 const int PIN_ENCOD_A_MOTOR_RIGHT = 3;              //A channel for encoder of right motor         
 const int PIN_ENCOD_B_MOTOR_RIGHT = 5;              //B channel for encoder of right motor 
 
-const int PIN_SIDE_LIGHT_LED = 46;                  //Side light blinking led pin
+const int PIN_SIDE_LIGHT_LED = 6;                  //Side light blinking led pin
 
 unsigned long lastMilli = 0;
+
+//l298n driver pin configuration
+const int A_motor_speed = 9;
+const int A_motor_1 = 8;
+const int A_motor_2 = 7;  
+
+const int B_motor_speed = 11;
+const int B_motor_1 = 12;
+const int B_motor_2 = 13; 
 
 //--- Robot-specific constants ---
 const double radius = 0.04;                   //Wheel radius, in m
@@ -57,10 +64,6 @@ volatile float pos_right = 0;      //Right motor encoder position
 
 PID PID_leftMotor(&speed_act_left, &speed_cmd_left, &speed_req_left, PID_left_param[0], PID_left_param[1], PID_left_param[2], DIRECT);          //Setting up the PID for left motor
 PID PID_rightMotor(&speed_act_right, &speed_cmd_right, &speed_req_right, PID_right_param[0], PID_right_param[1], PID_right_param[2], DIRECT);   //Setting up the PID for right motor
-
-Adafruit_MotorShield AFMS = Adafruit_MotorShield();  // Create the motor shield object with the default I2C address
-Adafruit_DCMotor *leftMotor = AFMS.getMotor(1);      //Create left motor object
-Adafruit_DCMotor *rightMotor = AFMS.getMotor(2);     //Create right motor object
   
 ros::NodeHandle nh;
 
@@ -93,19 +96,21 @@ void setup() {
   
   pinMode(PIN_SIDE_LIGHT_LED, OUTPUT);      //set pin for side light leds as output
   analogWrite(PIN_SIDE_LIGHT_LED, 255);     //light up side lights
-  
+
+  //Setting motors pin as an output
+      //motor A
+  pinMode(A_motor_speed, OUTPUT);
+  pinMode(A_motor_1, OUTPUT);
+  pinMode(A_motor_2, OUTPUT);
+      //motor B
+  pinMode(B_motor_speed, OUTPUT);
+  pinMode(B_motor_1, OUTPUT);
+  pinMode(B_motor_2, OUTPUT);
+ 
   nh.initNode();                            //init ROS node
   nh.getHardware()->setBaud(57600);         //set baud for ROS serial communication
   nh.subscribe(cmd_vel);                    //suscribe to ROS topic for velocity commands
   nh.advertise(speed_pub);                  //prepare to publish speed in ROS topic
- 
-  AFMS.begin();
-  
-  //setting motor speeds to zero
-  leftMotor->setSpeed(0);
-  leftMotor->run(BRAKE);
-  rightMotor->setSpeed(0);
-  rightMotor->run(BRAKE);
  
   //setting PID parameters
   PID_leftMotor.SetSampleTime(95);
@@ -177,21 +182,20 @@ void loop() {
     // compute PWM value for left motor. Check constant definition comments for more information.
     PWM_leftMotor = constrain(((speed_req_left+sgn(speed_req_left)*min_speed_cmd)/speed_to_pwm_ratio) + (speed_cmd_left/speed_to_pwm_ratio), -255, 255); //
     
-    if (noCommLoops >= noCommLoopMax) {                   //Stopping if too much time without command
-      leftMotor->setSpeed(0);
-      leftMotor->run(BRAKE);
-    }
-    else if (speed_req_left == 0){                        //Stopping
-      leftMotor->setSpeed(0);
-      leftMotor->run(BRAKE);
+    if (noCommLoops >= noCommLoopMax || speed_req_left == 0) {                   //Stopping if too much time without command
+      analogWrite(A_motor_speed , 0);
+      digitalWrite(A_motor_1 , 0);
+      digitalWrite(A_motor_2 , 0);
     }
     else if (PWM_leftMotor > 0){                          //Going forward
-      leftMotor->setSpeed(abs(PWM_leftMotor));
-      leftMotor->run(BACKWARD);
+      analogWrite(A_motor_speed , abs(PWM_leftMotor));
+      digitalWrite(A_motor_1 , 1);
+      digitalWrite(A_motor_2 , 0);
     }
     else {                                               //Going backward
-      leftMotor->setSpeed(abs(PWM_leftMotor));
-      leftMotor->run(FORWARD);
+      analogWrite(A_motor_speed , abs(PWM_leftMotor));
+      digitalWrite(A_motor_1 , 0);
+      digitalWrite(A_motor_2 , 1);
     }
     
     speed_cmd_right = constrain(speed_cmd_right, -max_speed, max_speed);    
@@ -199,21 +203,20 @@ void loop() {
     // compute PWM value for right motor. Check constant definition comments for more information.
     PWM_rightMotor = constrain(((speed_req_right+sgn(speed_req_right)*min_speed_cmd)/speed_to_pwm_ratio) + (speed_cmd_right/speed_to_pwm_ratio), -255, 255); // 
 
-    if (noCommLoops >= noCommLoopMax) {                   //Stopping if too much time without command
-      rightMotor->setSpeed(0);
-      rightMotor->run(BRAKE);
-    }
-    else if (speed_req_right == 0){                       //Stopping
-      rightMotor->setSpeed(0);
-      rightMotor->run(BRAKE);
+    if (noCommLoops >= noCommLoopMax || speed_req_right == 0) {                   //Stopping if too much time without command
+      analogWrite(B_motor_speed , 0);
+      digitalWrite(B_motor_1 , 0);
+      digitalWrite(B_motor_2 , 1);
     }
     else if (PWM_rightMotor > 0){                         //Going forward
-      rightMotor->setSpeed(abs(PWM_rightMotor));
-      rightMotor->run(FORWARD);
+      analogWrite(B_motor_speed , abs(PWM_rightMotor));
+      digitalWrite(B_motor_1 , 1);
+      digitalWrite(B_motor_2 , 0);
     }
     else {                                                //Going backward
-      rightMotor->setSpeed(abs(PWM_rightMotor));
-      rightMotor->run(BACKWARD);
+      analogWrite(B_motor_speed , abs(PWM_rightMotor));
+      digitalWrite(B_motor_1 , 0);
+      digitalWrite(B_motor_2 , 1);
     }
 
     if((millis()-lastMilli) >= LOOPTIME){         //write an error if execution time of the loop in longer than the specified looptime
@@ -255,3 +258,4 @@ void encoderRightMotor() {
 template <typename T> int sgn(T val) {
     return (T(0) < val) - (val < T(0));
 }
+
