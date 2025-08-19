@@ -4,6 +4,7 @@
      For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
 <robot
   name="description_pkg">
+
   <link
     name="base_link">
     <inertial>
@@ -151,7 +152,7 @@
       xyz="0 1 0" />
   </joint>
   <link
-    name="lidar">
+    name="laser">
     <inertial>
       <origin
         xyz="0.0067683 -0.00020768 -0.022438"
@@ -199,7 +200,7 @@
     <parent
       link="base_link" />
     <child
-      link="lidar" />
+      link="laser" />
     <axis
       xyz="0 0 0" />
   </joint>

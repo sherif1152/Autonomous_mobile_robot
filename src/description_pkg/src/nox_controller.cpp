@@ -34,7 +34,7 @@ int main(int argc, char** argv){
   ros::NodeHandle n;
   ros::NodeHandle nh_private_("~");
   ros::Subscriber sub = n.subscribe("speed", 50, handle_speed);
-  ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("odom", 50);
+  ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("/odom", 50);
   tf::TransformBroadcaster broadcaster;  
   
   double rate = 10.0;
