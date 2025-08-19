@@ -1,47 +1,47 @@
 DWAPlannerROS:
 
 # Robot Configuration Parameters
-  max_vel_x: 0.2
-  min_vel_x: 0.15
-
+  max_vel_x: 0.7          # Reduce from 0.7 to have better control
+  min_vel_x: 0.3          # Reduce from 0.3 to allow slower movements
+  
   max_vel_y: 0.0
   min_vel_y: 0.0
   meter_scoring : true
 
 # The velocity when robot is moving in a straight line
-  max_vel_trans:  0.2
-  min_vel_trans:  0.15
+  # Velocity Limits (m/s for translation, rad/s for rotation)
+  max_vel_trans: 0.7      # Reduce from 0.7
+  min_vel_trans: 0.3      # Reduce from 0.3
+  
+  max_vel_theta: 1.5      # Reduce from 1.2 for more controlled rotation
+  min_vel_theta: -2.0     # Adjust accordingly
 
-  max_vel_theta: 1.5
-  min_vel_theta: 1.3
-
-  acc_lim_x: 1.0
-  acc_lim_y: 0.0
-  acc_lim_theta: 1.5 
+  # Acceleration Limits (m/s² for translation, rad/s² for rotation)
+  acc_lim_x: 0.3          # Reduce from 0.5 for smoother acceleration
+  acc_lim_theta: 2.0      # Reduce from 3.0 for smoother rotation
 
 # Goal Tolerance Parameters
-  xy_goal_tolerance: 0.1
-  yaw_goal_tolerance: 0.1
+  xy_goal_tolerance: 0.15   # Slightly reduce from 0.2
+  yaw_goal_tolerance: 0.15  # Increase from 0.1 for easier goal reaching
   latch_xy_goal_tolerance: false
 
 # Forward Simulation Parameters
-  sim_time: 2.0
-  vx_samples: 20
-  vy_samples: 0
-  vth_samples: 40
-  controller_frequency: 10.0
+  sim_time: 4.0            # Reduce from 7.5 for faster replanning
+  vx_samples: 12           # Reduce from 20 for faster computation
+  vth_samples: 15          # Reduce from 20
+  controller_frequency: 10.0 # Keep this value
 
 # Trajectory Scoring Parameters
-  path_distance_bias: 32.0
-  goal_distance_bias: 20.0
-  occdist_scale: 0.02
+  path_distance_bias: 50.0  # Reduce from 92.0 to be less strict about path following
+  goal_distance_bias: 24.0  # Increase from 20.0 to give more weight to reaching the goal
+  occdist_scale: 0.05      # Increase from 0.02 for better obstacle avoidance
   forward_point_distance: 0.325
   stop_time_buffer: 0.2
   scaling_speed: 0.25
   max_scaling_factor: 0.2
 
 # Oscillation Prevention Parameters
-  oscillation_reset_dist: 0.05
+  oscillation_reset_dist: 0.1
 
 # Debugging
   publish_traj_pc : true
