@@ -1,5 +1,6 @@
 # Mobile Robot Project (ROS 1 – Noetic)
 
+
 ## Hardware Configuration
 
 ### Mechanical Structure
@@ -15,9 +16,8 @@
 - **Encoders**: Attached to both drive wheels
 - **Additional Sensors**: LED indicator on PIN 25 for system status
 
-![Robot Overview - Front View](images/robot_front.png)
-![Robot CAD Model](images/robot_cad.png)
-![Robot Dimensions](images/robot_dimensions.png)
+![Robot Overview - Front View](images/robot.jpeg)
+![Robot CAD Model](images/map.jpeg)
 
 ### Key Mechanical Parameters
 - **Speed Characteristics**:
@@ -26,6 +26,7 @@
 - **Construction**: Rigid chassis with precision-mounted motors for accurate odometry
 
 ## Electrical Components & Pin Connections
+
 
 ### Core Computing Units
 - **Main Computer**: NVIDIA Jetson Nano
@@ -65,8 +66,6 @@
 | Right Encoder B| GPIO 9 | Encoder Phase |
 | Status LED   | GPIO 25  | System Status |
 
-![Circuit Schematic](images/circuit_schematic.png)
-![Wiring Diagram](images/wiring_diagram.png)
 
 ### Power Distribution
 - **Main Battery**: 4S LiPo Battery
@@ -77,7 +76,6 @@
     - Primary output: Jetson Nano power supply
     - Efficiency: >90%
 
-![Power Distribution Diagram](images/power_diagram.png)
 
 ## Software Setup
 
@@ -302,8 +300,6 @@ evince frames.pdf
     rostopic echo /move_base/local_costmap/costmap
     rostopic echo /move_base/global_costmap/costmap
    ```
-
-![Troubleshooting Flowchart](images/troubleshooting_flow.png)
 
 > Note: Always check battery voltage under load - system may behave erratically at voltages below 14.4V
 
